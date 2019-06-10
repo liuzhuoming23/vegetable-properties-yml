@@ -1,5 +1,6 @@
 package com.github.liuzhuoming23.vegetable.propertiesyml.controller;
 
+import com.github.liuzhuoming23.vegetable.propertiesyml.convertor.PropertiesConvertor;
 import com.github.liuzhuoming23.vegetable.propertiesyml.io.Writer;
 import com.github.liuzhuoming23.vegetable.propertiesyml.convertor.YmlConvertor;
 import java.util.ArrayList;
@@ -32,7 +33,9 @@ public class ConvertController {
      * 点
      */
     private final static String DOT = ".";
+
     private static final YmlConvertor YML_CONVERTOR = new YmlConvertor();
+    private static final PropertiesConvertor PROPERTIES_CONVERTOR = new PropertiesConvertor();
 
     @RequestMapping(value = "/convert")
     public void convert(HttpServletResponse response, @RequestParam("file") MultipartFile file) {
@@ -40,14 +43,15 @@ public class ConvertController {
         String filename = file.getOriginalFilename();
         if (filename != null && filename.contains(DOT)) {
             String suffixName = filename.substring(filename.lastIndexOf(DOT));
-            String newFilename = filename.substring(0, filename.lastIndexOf(DOT)) + SUFFIXNAME_YML;
+            String newFilename;
 
             if (SUFFIXNAME_PROPERTIES.equalsIgnoreCase(suffixName)) {
+                newFilename = filename.substring(0, filename.lastIndexOf(DOT)) + SUFFIXNAME_YML;
                 lines = YML_CONVERTOR.convert(file);
             } else if (SUFFIXNAME_YML.equalsIgnoreCase(suffixName)) {
-                //TODO yml转properties方法
-                newFilename = "error.txt";
-                lines.add("yml转properties方法暂未实现");
+                newFilename =
+                    filename.substring(0, filename.lastIndexOf(DOT)) + SUFFIXNAME_PROPERTIES;
+                lines = PROPERTIES_CONVERTOR.convert(file);
             } else {
                 newFilename = "error.txt";
                 lines.add("不支持转换" + suffixName + "文件");

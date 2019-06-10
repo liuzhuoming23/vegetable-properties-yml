@@ -1,11 +1,13 @@
 package com.github.liuzhuoming23.vegetable.propertiesyml.convertor;
 
-import com.github.liuzhuoming23.vegetable.propertiesyml.domain.YmlTree;
-import com.github.liuzhuoming23.vegetable.propertiesyml.io.Reader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.springframework.web.multipart.MultipartFile;
+import org.yaml.snakeyaml.Yaml;
 
 /**
  * properties转换器
@@ -16,97 +18,67 @@ public class PropertiesConvertor implements Convertor {
 
     @Override
     public List<String> convert(File file) {
-        return null;
+        try (FileInputStream fileInputStream = new FileInputStream(file)) {
+            Yaml yaml = new Yaml();
+            Map map = yaml.loadAs(fileInputStream, Map.class);
+            format(map, "");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return PROPERTIES_LINES;
     }
 
     @Override
     public List<String> convert(MultipartFile multipartFile) {
-        return null;
+        try (FileInputStream fileInputStream = (FileInputStream) multipartFile.getInputStream()) {
+            Yaml yaml = new Yaml();
+            Map map = yaml.loadAs(fileInputStream, Map.class);
+            format(map, "");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return PROPERTIES_LINES;
     }
 
-    public static List<YmlTree> parse(List<String> lines) {
-        List<List<String>> list = new ArrayList<>();
-        for (int i = 0; i < lines.size(); i++) {
-            List<String> strings = new ArrayList<>();
-            strings.add(lines.get(i));
-            if (indentNum(lines.get(i)) == 0) {
-                list.add(strings);
-                strings.clear();
-            }
-        }
+    /**
+     * properties行数据集合
+     */
+    private static List<String> PROPERTIES_LINES = new ArrayList<>();
+    /**
+     * 值连接符
+     */
+    private static final String VALUE_LINK_SIGN = ":";
+    /**
+     * 点
+     */
+    private final static String DOT = ".";
 
-        List<YmlTree> ymlTrees = new ArrayList<>();
-        for (int i = 0; i < lines.size(); i++) {
-            YmlTree ymlTree = new YmlTree();
-            if (!"".equals(lines.get(i).trim()) && !lines.get(i).trim().startsWith("#")) {
-                String line = lines.get(i).stripLeading();
-                String[] strings = line.split(":");
-
-                String value = "";
-                if (strings.length == 2) {
-                    value = strings[1].trim();
-                }
-
-                int indentNum = indentNum(lines.get(i));
-
-                if (indentNum == 0) {
-                    ymlTree.setName(strings[0].trim());
-                    ymlTree.setValue(value);
-                    ymlTree.setIndexNum(indentNum);
+    /**
+     * 格式化peoperties
+     *
+     * @param map properties嵌套数据
+     * @param prefix properties参数前缀
+     */
+    private void format(Map map, String prefix) {
+        Set set = map.keySet();
+        for (Object key : set) {
+            Object value = map.get(key);
+            if (value instanceof Map) {
+                if ("".equals(prefix)) {
+                    format((Map) value, key.toString());
                 } else {
-                    if (indentNum > indentNum(lines.get(i - 1))) {
-                        YmlTree node = new YmlTree();
-                        node.setName(strings[0].trim());
-                        node.setValue(value);
-                        node.setIndexNum(indentNum);
-                        ymlTree.getChildren().add(node);
-                    }
+                    format((Map) value, prefix + DOT + key);
                 }
-            }
-            ymlTrees.add(ymlTree);
-        }
-        return ymlTrees;
-    }
-
-    /**
-     * 将数据行集合按照缩进解析为多个数据行集合
-     *
-     * @param lines 数据行集合
-     * @return 数据行集合的集合
-     */
-    public static List<List<String>> parseList2ListInList(List<String> lines) {
-        List<List<String>> list = new ArrayList<>();
-        List<String> strings = new ArrayList<>();
-        for (int i = 0; i < lines.size(); i++) {
-            String line = lines.get(i);
-            if (!"".equals(lines.get(i).trim()) && !lines.get(i).trim().startsWith("#")) {
-                if (i != 0 && indentNum(line) == 0) {
-                    if (!strings.isEmpty()) {
-                        List<String> strings1 = List.copyOf(strings);
-                        list.add(strings1);
-                        strings = new ArrayList<>();
-                    }
+            } else {
+                if (value == null) {
+                    value = "";
                 }
-                strings.add(line);
-                if (i == lines.size() - 1) {
-                    if (!strings.isEmpty()) {
-                        List<String> strings1 = List.copyOf(strings);
-                        list.add(strings1);
-                    }
+                if ("".equals(prefix)) {
+                    PROPERTIES_LINES.add(key + VALUE_LINK_SIGN + value);
+                } else {
+                    PROPERTIES_LINES.add(prefix + DOT + key + VALUE_LINK_SIGN + value);
                 }
             }
         }
-        return list;
-    }
-
-
-    /**
-     * 获取行数据空格缩进数量
-     *
-     * @param line 数据行
-     * @return 缩进空格数量
-     */
-    public static int indentNum(String line) {
-        return line.length() - line.stripLeading().length();
     }
 }

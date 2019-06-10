@@ -54,8 +54,8 @@ public class YmlConvertor implements Convertor {
                 value = strings[1].trim();
             }
             List<String> strs = Arrays.asList(strings[0].trim().split("\\."));
-            strs = new ArrayList<>(strs);
-            insertNode(strs, ymlTrees, value);
+            final List<String> copy = new ArrayList<>(strs);
+            insertNode(copy, ymlTrees, value);
         }
     }
 

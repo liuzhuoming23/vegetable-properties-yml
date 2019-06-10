@@ -25,10 +25,6 @@ public class YmlTree {
      */
     private String comment;
     /**
-     * 缩进数量
-     */
-    private int indexNum = 0;
-    /**
      * 子节点集合
      */
     private List<YmlTree> children = new ArrayList<>();

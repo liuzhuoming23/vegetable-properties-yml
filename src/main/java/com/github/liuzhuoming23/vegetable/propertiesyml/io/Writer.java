@@ -26,8 +26,7 @@ public class Writer {
         try {
             file.createNewFile();
             try (FileWriter fileWriter = new FileWriter(file);
-                BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)
-            ) {
+                BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
                 for (String line : lines) {
                     bufferedWriter.write(line);
                     bufferedWriter.newLine();
@@ -49,8 +48,7 @@ public class Writer {
     public static void write(HttpServletResponse response, String filename, List<String> lines) {
         response.setContentType("application/force-download");
         response.addHeader("Content-Disposition", "attachment;fileName=" + filename);
-        try {
-            OutputStream outputStream = response.getOutputStream();
+        try (OutputStream outputStream = response.getOutputStream();) {
             for (String line : lines) {
                 outputStream.write(line.getBytes(StandardCharsets.UTF_8));
                 outputStream.write(System.lineSeparator().getBytes(StandardCharsets.UTF_8));
