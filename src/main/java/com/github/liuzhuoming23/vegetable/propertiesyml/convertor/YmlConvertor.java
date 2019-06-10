@@ -18,6 +18,7 @@ public class YmlConvertor implements Convertor {
     @Override
     public List<String> convert(File file) {
         List<String> lines = Reader.line(file);
+
         List<YmlTree> ymlTrees = new ArrayList<>();
         for (String line : lines) {
             insert(line, ymlTrees);
@@ -29,11 +30,13 @@ public class YmlConvertor implements Convertor {
     @Override
     public List<String> convert(MultipartFile multipartFile) {
         List<String> lines = Reader.line(multipartFile);
-        List<YmlTree> ymlTrees = new ArrayList<>();
+        //原文件抽象为最高级的根节点，其中每一项yml的配置对应为文件节点下面的各级分支
+        YmlTree ymlTree = new YmlTree();
+        ymlTree.setName(".yml");
         for (String line : lines) {
-            insert(line, ymlTrees);
+            insert(line, ymlTree.getChildren());
         }
-        format(ymlTrees, "");
+        format(ymlTree.getChildren(), "");
         return YML_LINES;
     }
 
@@ -41,7 +44,7 @@ public class YmlConvertor implements Convertor {
      * 插入数据
      *
      * @param line 行数据
-     * @param ymlTrees yml节点列表
+     * @param ymlTrees 上级ymlTree子节点集合
      */
     private static void insert(String line, List<YmlTree> ymlTrees) {
         if (!"".equals(line.trim()) && !line.trim().startsWith("#")) {
@@ -59,9 +62,9 @@ public class YmlConvertor implements Convertor {
     /**
      * 递归添加节点数据
      *
-     * @param strs 数据节点列表
-     * @param ymlTrees yml节点集合
-     * @param value yml值
+     * @param strs 根据properties分解开的数据节点列表
+     * @param ymlTrees 上级ymlTree子节点集合
+     * @param value 值
      */
     private static void insertNode(List<String> strs, List<YmlTree> ymlTrees, String value) {
         if (!strs.isEmpty()) {
@@ -71,20 +74,22 @@ public class YmlConvertor implements Convertor {
             node.setName(first);
             strs.remove(0);
 
+            //如果节点下面的子节点数量为0，则为终端节点，也就是赋值节点
             if (strs.size() == 0) {
                 node.setValue(value);
             }
 
             boolean hasEqualsName = false;
+            //遍历查询节点是否存在
             for (YmlTree ymlTree : ymlTrees) {
+                //如果节点名称已存在，则递归添加剩下的数据节点
                 if (first.equals(ymlTree.getName())) {
                     hasEqualsName = true;
-                    //如果节点名称已存在，则递归查找此节点的子节点
                     insertNode(strs, ymlTree.getChildren(), value);
                 }
             }
+            //如果遍历结果为节点名称不存在，则递归添加剩下的数据节点，并把新节点添加到上级ymlTree的子节点中
             if (!hasEqualsName) {
-                //如果节点名称不存在，则递归添加新节点
                 insertNode(strs, node.getChildren(), value);
                 ymlTrees.add(node);
             }
