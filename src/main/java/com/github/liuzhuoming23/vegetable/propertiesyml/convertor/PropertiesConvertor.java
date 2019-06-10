@@ -1,6 +1,7 @@
 package com.github.liuzhuoming23.vegetable.propertiesyml.convertor;
 
 import com.github.liuzhuoming23.vegetable.propertiesyml.domain.YmlTree;
+import com.github.liuzhuoming23.vegetable.propertiesyml.io.Reader;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,16 @@ public class PropertiesConvertor implements Convertor {
     }
 
     public static List<YmlTree> parse(List<String> lines) {
+        List<List<String>> list = new ArrayList<>();
+        for (int i = 0; i < lines.size(); i++) {
+            List<String> strings = new ArrayList<>();
+            strings.add(lines.get(i));
+            if (indentNum(lines.get(i)) == 0) {
+                list.add(strings);
+                strings.clear();
+            }
+        }
+
         List<YmlTree> ymlTrees = new ArrayList<>();
         for (int i = 0; i < lines.size(); i++) {
             YmlTree ymlTree = new YmlTree();
@@ -58,12 +69,44 @@ public class PropertiesConvertor implements Convertor {
     }
 
     /**
+     * 将数据行集合按照缩进解析为多个数据行集合
+     *
+     * @param lines 数据行集合
+     * @return 数据行集合的集合
+     */
+    public static List<List<String>> parseList2ListInList(List<String> lines) {
+        List<List<String>> list = new ArrayList<>();
+        List<String> strings = new ArrayList<>();
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines.get(i);
+            if (!"".equals(lines.get(i).trim()) && !lines.get(i).trim().startsWith("#")) {
+                if (i != 0 && indentNum(line) == 0) {
+                    if (!strings.isEmpty()) {
+                        List<String> strings1 = List.copyOf(strings);
+                        list.add(strings1);
+                        strings = new ArrayList<>();
+                    }
+                }
+                strings.add(line);
+                if (i == lines.size() - 1) {
+                    if (!strings.isEmpty()) {
+                        List<String> strings1 = List.copyOf(strings);
+                        list.add(strings1);
+                    }
+                }
+            }
+        }
+        return list;
+    }
+
+
+    /**
      * 获取行数据空格缩进数量
      *
      * @param line 数据行
      * @return 缩进空格数量
      */
-    private static int indentNum(String line) {
+    public static int indentNum(String line) {
         return line.length() - line.stripLeading().length();
     }
 }
