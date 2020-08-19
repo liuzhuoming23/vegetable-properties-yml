@@ -17,6 +17,7 @@ public class YmlConvertor implements Convertor {
 
     @Override
     public List<String> convert(File file) {
+        YML_LINES = new ArrayList<>();
         List<String> lines = Reader.line(file);
 
         List<YmlTree> ymlTrees = new ArrayList<>();
@@ -29,6 +30,7 @@ public class YmlConvertor implements Convertor {
 
     @Override
     public List<String> convert(MultipartFile multipartFile) {
+        YML_LINES = new ArrayList<>();
         List<String> lines = Reader.line(multipartFile);
         //原文件抽象为最高级的根节点，其中每一项yml的配置对应为文件节点下面的各级分支
         YmlTree ymlTree = new YmlTree();
@@ -43,7 +45,7 @@ public class YmlConvertor implements Convertor {
     /**
      * 插入数据
      *
-     * @param line 行数据
+     * @param line     行数据
      * @param ymlTrees 上级ymlTree子节点集合
      */
     private static void insert(String line, List<YmlTree> ymlTrees) {
@@ -62,9 +64,9 @@ public class YmlConvertor implements Convertor {
     /**
      * 递归添加节点数据
      *
-     * @param strs 根据properties分解开的数据节点列表
+     * @param strs     根据properties分解开的数据节点列表
      * @param ymlTrees 上级ymlTree子节点集合
-     * @param value 值
+     * @param value    值
      */
     private static void insertNode(List<String> strs, List<YmlTree> ymlTrees, String value) {
         if (!strs.isEmpty()) {
@@ -99,7 +101,7 @@ public class YmlConvertor implements Convertor {
     /**
      * yml行数据集合
      */
-    private static final List<String> YML_LINES = new ArrayList<>();
+    private static List<String> YML_LINES = new ArrayList<>();
     /**
      * 缩进空格
      */
@@ -113,7 +115,7 @@ public class YmlConvertor implements Convertor {
      * 缩进格式化
      *
      * @param ymlTrees yml多叉树
-     * @param blanks 缩进格式
+     * @param blanks   缩进格式
      */
     private static void format(List<YmlTree> ymlTrees, String blanks) {
         for (YmlTree ymlTree : ymlTrees) {

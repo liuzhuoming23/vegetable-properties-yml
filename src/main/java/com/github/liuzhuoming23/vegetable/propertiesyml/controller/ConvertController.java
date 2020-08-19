@@ -34,9 +34,6 @@ public class ConvertController {
      */
     private final static String DOT = ".";
 
-    private static final YmlConvertor YML_CONVERTOR = new YmlConvertor();
-    private static final PropertiesConvertor PROPERTIES_CONVERTOR = new PropertiesConvertor();
-
     @RequestMapping(value = "/convert")
     public void convert(HttpServletResponse response, @RequestParam("file") MultipartFile file) {
         List<String> lines = new ArrayList<>();
@@ -45,13 +42,15 @@ public class ConvertController {
             String suffixName = filename.substring(filename.lastIndexOf(DOT));
             String newFilename;
 
+            log.info("suffixName={}", SUFFIXNAME_PROPERTIES);
+
             if (SUFFIXNAME_PROPERTIES.equalsIgnoreCase(suffixName)) {
                 newFilename = filename.substring(0, filename.lastIndexOf(DOT)) + SUFFIXNAME_YML;
-                lines = YML_CONVERTOR.convert(file);
+                lines = new YmlConvertor().convert(file);
             } else if (SUFFIXNAME_YML.equalsIgnoreCase(suffixName)) {
                 newFilename =
                     filename.substring(0, filename.lastIndexOf(DOT)) + SUFFIXNAME_PROPERTIES;
-                lines = PROPERTIES_CONVERTOR.convert(file);
+                lines = new PropertiesConvertor().convert(file);
             } else {
                 newFilename = "error.txt";
                 lines.add("不支持转换" + suffixName + "文件");

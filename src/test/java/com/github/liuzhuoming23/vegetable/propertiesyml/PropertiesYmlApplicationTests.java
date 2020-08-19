@@ -22,8 +22,8 @@ public class PropertiesYmlApplicationTests {
     @Test
     public void properties2yml() {
         Convertor convertor = new YmlConvertor();
-        File in = new File("C:/Users/fm/Desktop/properties.properties");
-        File out = new File("C:/Users/fm/Desktop/properties.yml");
+        File in = new File("/Users/liuzhuoming/Desktop/test.properties");
+        File out = new File("/Users/liuzhuoming/Desktop/test.yml");
         Writer.write(out, convertor.convert(in));
     }
 

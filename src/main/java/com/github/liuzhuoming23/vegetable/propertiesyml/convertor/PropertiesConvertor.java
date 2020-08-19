@@ -18,6 +18,7 @@ public class PropertiesConvertor implements Convertor {
 
     @Override
     public List<String> convert(File file) {
+        PROPERTIES_LINES = new ArrayList<>();
         try (FileInputStream fileInputStream = new FileInputStream(file)) {
             Yaml yaml = new Yaml();
             Map map = yaml.loadAs(fileInputStream, Map.class);
@@ -30,6 +31,7 @@ public class PropertiesConvertor implements Convertor {
 
     @Override
     public List<String> convert(MultipartFile multipartFile) {
+        PROPERTIES_LINES = new ArrayList<>();
         try (FileInputStream fileInputStream = (FileInputStream) multipartFile.getInputStream()) {
             Yaml yaml = new Yaml();
             Map map = yaml.loadAs(fileInputStream, Map.class);
@@ -47,7 +49,7 @@ public class PropertiesConvertor implements Convertor {
     /**
      * 值连接符
      */
-    private static final String VALUE_LINK_SIGN = ":";
+    private static final String VALUE_LINK_SIGN = "=";
     /**
      * 点
      */
