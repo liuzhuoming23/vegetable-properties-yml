@@ -21,17 +21,17 @@ public class PropertiesYmlApplicationTests {
 
     @Test
     public void properties2yml() {
-        Convertor convertor = new YmlConvertor();
-        File in = new File("/Users/liuzhuoming/Desktop/test.properties");
-        File out = new File("/Users/liuzhuoming/Desktop/test.yml");
-        Writer.write(out, convertor.convert(in));
+//        Convertor convertor = new YmlConvertor();
+//        File in = new File("/Users/liuzhuoming/Desktop/test.properties");
+//        File out = new File("/Users/liuzhuoming/Desktop/test.yml");
+//        Writer.write(out, convertor.convert(in));
     }
 
     @Test
     public void yml2properties() {
-        Convertor convertor = new PropertiesConvertor();
-        File in = new File("C:/Users/fm/Desktop/yml.yml");
-        File out = new File("C:/Users/fm/Desktop/yml.properties");
-        Writer.write(out, convertor.convert(in));
+//        Convertor convertor = new PropertiesConvertor();
+//        File in = new File("C:/Users/fm/Desktop/yml.yml");
+//        File out = new File("C:/Users/fm/Desktop/yml.properties");
+//        Writer.write(out, convertor.convert(in));
     }
 }
